@@ -70,7 +70,7 @@ const checkPort = async (port, host) => {
     // create a socket
     const socket = new PromiseSocket(new net.Socket());
     // set the timeout
-    socket.setTimeout(2);
+    socket.setTimeout(5);
     // connect
     try {
         // connect to host @ port
@@ -97,6 +97,7 @@ const prepareFileData = async (file_path) => {
     const file = {};
     // get the file name and ext
     file.name = path.basename(file_path);
+    file_path = file_path.replace('\\', '');
     // open the file and read the bytes
     file.bytes = await fs.readFile(file_path).catch(err => console.log(err));
     // convert file JSON to string to buffer
