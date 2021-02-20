@@ -1,12 +1,12 @@
-// use the node net package
+// use to connect and write data to receiver
 const net = require('net');
-// use the dns node package
+// use to resolve hostname from ip address
 const dns = require('dns').promises;
-// use fs for...files
+// use for file reading/writing
 const fs = require('fs').promises;
-// use os node package
+// use for obtaining internal IP
 const os = require('os');
-// define port
+// port used across active fairdrop devices
 const PORT = 7329;
 
 // create a server
@@ -27,7 +27,7 @@ server.on('connection', async (socket) => {
 const handler = async (socket) => {
     // Received data
     socket.on('data', async (data) => await handleData(data));
-    // On disconnect
+    // On end data tranmission
     socket.on('end', async () => {
         await fs.writeFile('received_dog.jpg', file);
         console.log('Transfer complete')

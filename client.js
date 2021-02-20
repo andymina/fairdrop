@@ -1,39 +1,39 @@
-// use the node net package
+// use to connect and write data to receiver
 const net = require('net');
-// use dns for hostname
+// use to resolve hostname from ip address
 const dns = require('dns').promises;
-// use fs for...files
+// use for file reading/writing
 const fs = require('fs').promises;
-// use promises to resolve the socket
+// use for a promised based approach to net
 const { PromiseSocket } = require('promise-socket');
-// gets users prompt
+// use to get user prompt
 const prompt = require('prompt-sync')();
-// app port
+// port used across active fairdrop devices
 const PORT = 7329;
 
 /**
  * Finds which users are currently available to receive items.
  * 
- * @returns an obj defining key/val pairs where key = hostname and val = IPv4
+ * @returns an array of device objects.
+ * 
+ * A device object:
+ * { name: <String>, ip: <String> }
  */
 const findReceivers = async () => {
-    // set res
+    // set result array
     const res = [];
     // set internal IPv4 prefix
     const HOST = '192.168.1.';
-    // get the port to test
-    const PORT = 7329;
-    // loop through ip addresses
+    // loop through potential ip addresses
     for (let i = 1; i <= 255; i++) {
         // set ip
         let ip = HOST + String(i);
-        // check the port
+        // check if this device is running fairdrop
         let status = await checkPort(PORT, ip);
-        // get the hostname
         if (status) {
             // retrieve device hostnames
             let hostnames = await dns.reverse(ip);
-            // set primary hostname in res
+            // set primary hostname in res and push device object
             res.push({ name: hostnames[0], ip: ip });
         }
     }
@@ -44,7 +44,7 @@ const findReceivers = async () => {
 /**
  * Pretty prints the list of receivers.
  * 
- * @param receivers An array of receiving devices.s
+ * @param receivers An array of receiving device objects.
  * @returns A string formatted to be pretty printed
  */
 const prettyReceivers = (receivers) => {
@@ -99,22 +99,29 @@ const sendData = (device, data) => {
     });
 }
 
+/**
+ * Entry point for file sending with fairdrop.
+ */
 const main = async () => {
-    // define data to be sent
-    // let data = 'Hello from Sender!';
-    const bytes = await fs.readFile('dog.jpg').catch((err) => console.log(err));
-    // console.log(bytes);
+    // prompt user for path to file to be sent
+    const path = prompt('Enter path to the file to be sent: ');
+    // get the file and read into byte array
+    const bytes = await fs.readFile(path).catch((err) => console.log(err));
+    // search for receivers
+    console.log('\nSearching for receivers...\n');
     // find users able to receive
     let receivers = await findReceivers();
     // show user receivers
     console.log(prettyReceivers(receivers));
     // prompt user
-    let option = prompt('Choose device # to send file to: ');
-    // define data
-    // connect to receiver
-    console.log(receivers[option - 1]);
-    sendData(receivers[option - 1], bytes);
+    const option = prompt('Choose device # to send file to: ');
+    // get device from receiver list
+    const device = receivers[option - 1];
+    // show user their selection
+    console.log(`Sending ${path} to ${device}`);
+    // send the data
+    sendData(device, bytes);
 }
 
 // run entry point
-main()// .catch(err => console.error('Fatal:', err));
+main().catch(err => console.error('Fatal:', err));
