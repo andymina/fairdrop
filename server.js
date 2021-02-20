@@ -34,8 +34,13 @@ const handler = async (socket) => {
 }
 
 const saveFile = async (bytes) => {
+    // grab the file object from bytes
     let file = JSON.parse(bytes);
-    await fs.writeFile(file.name, file.bytes);
+    // convert bytes back into raw data
+    file.bytes = Buffer.from(file.bytes.data);
+    // write the file
+    await fs.writeFile('1' + file.name, file.bytes);
+    // confirm
     console.log(`${file.name} saved`);
 }
 
