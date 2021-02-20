@@ -5,7 +5,7 @@ const dns = require('dns').promises;
 // use for file reading/writing
 const fs = require('fs').promises;
 // use for handling paths
-const path = require('path')
+const path = require('path');
 // use for a promised based approach to net
 const { PromiseSocket } = require('promise-socket');
 // use to get user prompt
@@ -136,7 +136,7 @@ const send = async (device, file_path) => {
  */
 const main = async () => {
     // prompt user for path to file to be sent
-    const file_path = prompt('Enter path to the file to be sent: ');
+    const file_path = prompt('Drag the file to be sent here: ').trim();
     // search for receivers
     console.log('\nSearching for receivers...\n');
     // find users able to receive
