@@ -39,7 +39,7 @@ const saveFile = async (bytes) => {
     // convert bytes back into raw data
     file.bytes = Buffer.from(file.bytes.data);
     // write the file
-    await fs.writeFile('1' + file.name, file.bytes);
+    await fs.writeFile(file.name, file.bytes);
     // confirm
     console.log(`${file.name} saved`);
 }
