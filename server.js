@@ -18,6 +18,8 @@ server.on('connection', async (socket) => {
     // print incoming connection
     console.log(`Incoming connection:
         Device name: ${hostnames[0]} | IPv4: ${socket.remoteAddress}`);
+    // keep the socket alive
+    socket.setKeepAlive(true);
     // pass socket to handler
     handler(socket);
 });
@@ -26,14 +28,17 @@ const handler = async (socket) => {
     // Received data
     socket.on('data', async (data) => await handleData(data));
     // On disconnect
-    socket.on('end', () => {
-        console.log('client disconnected');
+    socket.on('end', async () => {
+        await fs.writeFile('received_dog.jpg', file);
+        console.log('Transfer complete')
     });
 }
 
+let file = Buffer.from([]);
 const handleData = async (data) => {
     let bytes = Buffer.from(data);
-    await fs.writeFile('received_dog.jpg', bytes);
+    file = Buffer.concat([file, bytes]);
+    console.log(file);
 }
 
 // listen for errors

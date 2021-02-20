@@ -94,6 +94,7 @@ const sendData = (device, data) => {
     socket.connect({ port: PORT, host: device.ip }, () => {
         console.log(`Connected to ${device.name}`);
         socket.write(data);
+        socket.end();
         console.log('Data sent');
     });
 }
