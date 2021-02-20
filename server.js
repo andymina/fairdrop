@@ -18,27 +18,25 @@ server.on('connection', async (socket) => {
     // print incoming connection
     console.log(`Incoming connection:
         Device name: ${hostnames[0]} | IPv4: ${socket.remoteAddress}`);
-    // keep the socket alive
-    socket.setKeepAlive(true);
     // pass socket to handler
     handler(socket);
 });
 
+let totalBytes = Buffer.from([]);
 const handler = async (socket) => {
     // Received data
-    socket.on('data', async (data) => await handleData(data));
-    // On end data tranmission
-    socket.on('end', async () => {
-        await fs.writeFile('received_dog.jpg', file);
-        console.log('Transfer complete')
+    socket.on('data', (data) => {
+        // update the total bytes
+        totalBytes = Buffer.concat([totalBytes, Buffer.from(data)]);
     });
+    // On end data tranmission
+    socket.on('end', async () => await saveFile(totalBytes));
 }
 
-let file = Buffer.from([]);
-const handleData = async (data) => {
-    let bytes = Buffer.from(data);
-    file = Buffer.concat([file, bytes]);
-    console.log(file);
+const saveFile = async (bytes) => {
+    let file = JSON.parse(bytes);
+    await fs.writeFile(file.name, file.bytes);
+    console.log(`${file.name} saved`);
 }
 
 // listen for errors

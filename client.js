@@ -4,6 +4,8 @@ const net = require('net');
 const dns = require('dns').promises;
 // use for file reading/writing
 const fs = require('fs').promises;
+// use for handling paths
+const path = require('path')
 // use for a promised based approach to net
 const { PromiseSocket } = require('promise-socket');
 // use to get user prompt
@@ -81,6 +83,27 @@ const checkPort = async (port, host) => {
 }
 
 /**
+ * Prepares a file to be sent by creating a Buffer from a file object.
+ * A file object: {
+ *   name: <String>
+ *   bytes: <Buffer>
+ * }
+ * 
+ * @param file_path The path to the file to be sent.
+ * @returns A buffer of the file object
+ */
+const prepareFileData = async (file_path) => {
+    // create a file object to send
+    const file = {};
+    // get the file name and ext
+    file.name = path.basename(file_path);
+    // open the file and read the bytes
+    file.bytes = await fs.readFile(file_path).catch(err => console.log(err));
+    // convert file JSON to string to buffer
+    return Buffer.from(JSON.stringify(file));
+}
+
+/**
  * Sends data from client to server (sender to receiver).
  * 
  * @param device An obj that contains the sender's hostname and ip.
@@ -92,11 +115,20 @@ const sendData = (device, data) => {
     // connect and write data 
     // @TODO: prompt receiver
     socket.connect({ port: PORT, host: device.ip }, () => {
+        // display connection status
         console.log(`Connected to ${device.name}`);
+        // write data to receiver
         socket.write(data);
+        // end connection on finish writing
         socket.end();
+        // display status to user
         console.log('Data sent');
     });
+}
+
+const send = async (device, file_path) => {
+    let data = await prepareFileData(file_path);
+    sendData(device, data);
 }
 
 /**
@@ -104,9 +136,7 @@ const sendData = (device, data) => {
  */
 const main = async () => {
     // prompt user for path to file to be sent
-    const path = prompt('Enter path to the file to be sent: ');
-    // get the file and read into byte array
-    const bytes = await fs.readFile(path).catch((err) => console.log(err));
+    const file_path = prompt('Enter path to the file to be sent: ');
     // search for receivers
     console.log('\nSearching for receivers...\n');
     // find users able to receive
@@ -118,9 +148,9 @@ const main = async () => {
     // get device from receiver list
     const device = receivers[option - 1];
     // show user their selection
-    console.log(`Sending ${path} to ${device}`);
+    console.log(`Sending ${file_path} to ${device.name}`);
     // send the data
-    sendData(device, bytes);
+    send(device, file_path);
 }
 
 // run entry point
