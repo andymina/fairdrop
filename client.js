@@ -92,9 +92,9 @@ const sendData = (device, data) => {
     // connect and write data 
     // @TODO: prompt receiver
     socket.connect({ port: PORT, host: device.ip }, () => {
-        console.log('connected to receiver');
+        console.log(`Connected to ${device.name}`);
         socket.write(data);
-        console.log('sent data to receiver');
+        console.log('Data sent');
     });
 }
 
@@ -113,7 +113,6 @@ const main = async () => {
     // connect to receiver
     console.log(receivers[option - 1]);
     sendData(receivers[option - 1], bytes);
-    
 }
 
 // run entry point
