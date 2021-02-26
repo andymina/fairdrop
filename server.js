@@ -1,12 +1,12 @@
-// use the node net package
+// use to connect and write data to receiver
 const net = require('net');
-// use the dns node package
+// use to resolve hostname from ip address
 const dns = require('dns').promises;
-// use fs for...files
+// use for file reading/writing
 const fs = require('fs').promises;
-// use os node package
+// use for obtaining internal IP
 const os = require('os');
-// define port
+// port used across active fairdrop devices
 const PORT = 7329;
 
 // create a server
@@ -18,27 +18,30 @@ server.on('connection', async (socket) => {
     // print incoming connection
     console.log(`Incoming connection:
         Device name: ${hostnames[0]} | IPv4: ${socket.remoteAddress}`);
-    // keep the socket alive
-    socket.setKeepAlive(true);
     // pass socket to handler
     handler(socket);
 });
 
+let totalBytes = Buffer.from([]);
 const handler = async (socket) => {
     // Received data
-    socket.on('data', async (data) => await handleData(data));
-    // On disconnect
-    socket.on('end', async () => {
-        await fs.writeFile('received_dog.jpg', file);
-        console.log('Transfer complete')
+    socket.on('data', (data) => {
+        // update the total bytes
+        totalBytes = Buffer.concat([totalBytes, Buffer.from(data)]);
     });
+    // On end data tranmission
+    socket.on('end', async () => await saveFile(totalBytes));
 }
 
-let file = Buffer.from([]);
-const handleData = async (data) => {
-    let bytes = Buffer.from(data);
-    file = Buffer.concat([file, bytes]);
-    console.log(file);
+const saveFile = async (bytes) => {
+    // grab the file object from bytes
+    let file = JSON.parse(bytes);
+    // convert bytes back into raw data
+    file.bytes = Buffer.from(file.bytes.data);
+    // write the file
+    await fs.writeFile(file.name, file.bytes);
+    // confirm
+    console.log(`${file.name} saved`);
 }
 
 // listen for errors
