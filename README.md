@@ -14,28 +14,28 @@ Dependencies include: [promise-socket](https://www.npmjs.com/package/promise-soc
 ## Setup
 Clone this repo. After cloning, run `npm i` in the main directory to install the dependencies.
 
-*Note:* It includes `dog.jpg` which is the default file that will be transmitted between machines. T
+*Note:* This repo includes a `sample_files` directory of three files that can be sent for testing purposes.
 
 ## Usage
 fairdrop has two main files, `client.js` and `server.js`, which are used to send and receive files respectively. A single machine can be used as both the sender and receive to send a file to itself for testing purpose.
 
 1. Run `node server.js` on the receiving device to listen for any incoming data/requests.
-2. Run `node client.js` on the sending device. It will automatically search your local network for devices that are running a fairdrop server.
-3. Enter the number associated with the chosen receiver device. `client.js` has been hardcoded to send `dog.jpg` to the receiver by default. This can be modified on line 105 of `client.js`.
-4. In the root directory of the receiver, there will now be a `received_dog.jpg`and the sender will close connection. To use with files other than `dog.jpg`, line 32 of `server.js` must be updated.
+2. Run `node client.js` on the sending device. It will prompt you to drag the file you wish to be sent into the terminal. You can also enter the path to the file from the root folder.
+3. After selecting a file, the client will search for any devices on the network that are eligible to receive files and display them in a numbered list. Enter the number associated with the chosen receiver device.
+4. Once the file transfer is complete, the file will be in the root directory of the project, `/fairdrop`,
 
 ## To Do List
 
- - [ ] Allow users to choose the file to be sent.
+ - [x] Allow users to choose the file to be sent.
  - [ ] Better documentation.
  - Develop a GUI.
 	 - [ ] Mobile app
 	 - [ ] Desktop app
-- [ ] Clean up data handlers.
+- [x] Clean up data handlers.
 - Include more information in file transfer.
-	- [ ] File name
-	- [ ] File type
+	- [x] File name
+	- [x] File type
 	- [ ] File size (in bytes)
 - [ ] Send multiple files.
-- [ ] Consistent file type when receiving/sending.
+- [x] Consistent file type when receiving/sending.
 - [ ] User can set permissions on who to receive files from.
