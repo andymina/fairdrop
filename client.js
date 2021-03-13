@@ -103,8 +103,10 @@ const prepareFileData = async (file_path) => {
     file_path = file_path.replace('\\', '');
     // open the file and read the bytes
     file.bytes = await fs.readFile(file_path).catch(err => console.log(err));
+    console.log(`Before compression: ${file.bytes.length}`);
     // compress the bytes
     file.bytes = await zlib.gzipSync(file.bytes);
+    console.log(`After compression: ${file.bytes.length}`);
     // convert file JSON to string to buffer
     return Buffer.from(JSON.stringify(file));
 }
