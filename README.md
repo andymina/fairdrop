@@ -34,8 +34,7 @@ fairdrop has two main files, `client.js` and `server.js`, which are used to send
 - [x] Clean up data handlers.
 - Include more information in file transfer.
 	- [x] File name
-	- [x] File type
-	- [ ] File size (in bytes)
+	- [x] File bytes
 - [ ] Send multiple files.
 - [x] Consistent file type when receiving/sending.
 - [ ] User can set permissions on who to receive files from.

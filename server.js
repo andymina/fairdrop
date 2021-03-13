@@ -4,6 +4,8 @@ const net = require('net');
 const dns = require('dns').promises;
 // use for file reading/writing
 const fs = require('fs').promises;
+// use for decompression
+const zlib = require('zlib')
 // use for obtaining internal IP
 const os = require('os');
 // port used across active fairdrop devices
@@ -38,6 +40,8 @@ const saveFile = async (bytes) => {
     let file = JSON.parse(bytes);
     // convert bytes back into raw data
     file.bytes = Buffer.from(file.bytes.data);
+    // decompress
+    file.bytes = zlib.gunzipSync(file.bytes);
     // write the file
     await fs.writeFile(file.name, file.bytes);
     // confirm

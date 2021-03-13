@@ -4,6 +4,8 @@ const net = require('net');
 const dns = require('dns').promises;
 // use for file reading/writing
 const fs = require('fs').promises;
+// use for compressions
+const zlib = require('zlib');
 // use for handling paths
 const path = require('path');
 // use for a promised based approach to net
@@ -97,9 +99,12 @@ const prepareFileData = async (file_path) => {
     const file = {};
     // get the file name and ext
     file.name = path.basename(file_path);
+    // Prevent escaping irregular charactoers
     file_path = file_path.replace('\\', '');
     // open the file and read the bytes
     file.bytes = await fs.readFile(file_path).catch(err => console.log(err));
+    // compress the bytes
+    file.bytes = await zlib.gzipSync(file.bytes);
     // convert file JSON to string to buffer
     return Buffer.from(JSON.stringify(file));
 }
